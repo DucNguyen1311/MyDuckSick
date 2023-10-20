@@ -1,0 +1,41 @@
+<%- include("partials/header"); %>
+<br>
+<br>
+<h1>Add a part here!</h1>
+ 
+<form action="/AddPart" method="POST">
+  <div class="form-group">
+    <label>productCode</label>
+    <input type="text" class="form-control" placeholder="" name="productCode">
+  </div>
+  <div class="form-group">
+    <label>productName</label>
+    <input type="text" class="form-control" placeholder="" name="productName">
+  </div>
+  <div class="form-group">
+    <label>productLine</label>
+    <input type="text" class="form-control" placeholder="" name="productLine">
+  </div>
+  <div class="form-group">
+    <label>productBrand</label>
+    <input type="text" class="form-control" placeholder="" name="productBrand">
+  </div>
+  <div class="form-group">
+    <label>productDescription</label>
+    <input type="text" class="form-control" placeholder="" name="productDescription">
+  </div>
+  <div class="form-group">
+    <label>quantityInStock</label>
+    <input type="text" class="form-control" placeholder="" name="quantityInStock">
+  </div>
+  <div class="form-group">
+    <label>buyPrice</label>
+    <input type="text" class="form-control" placeholder="" name="buyPrice">
+  </div>
+  <div class="form-group">
+    <label>imageLink</label>
+    <input type="text" class="form-control" placeholder="" name="imageLink">
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+ 
