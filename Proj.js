@@ -1,10 +1,10 @@
+const oneDay = 1000 * 60 * 60 * 24;
 const express = require("express");
 const lodash = require('lodash');
 const mysql = require('mysql');
 const request = require('request');
 const bodyParser = require('body-parser');
 const session = require("express-session");
-const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const flash = require("connect-flash");
 const validator = require("email-validator");
@@ -12,27 +12,28 @@ let { validationResult } = require("express-validator");
 const { check } = require("express-validator");
 const passport = require("passport");
 const { Strategy } = require("passport-local");
-
 const app = express();
-
-app.use(flash());
-app.use(cors());
-app.use(cookieParser());
-app.use(session({secret: "duckdeeptry", resave: true, saveUninitialized: true}));
-app.use(express.json());
-app.use(passport.initialize())
-app.use(passport.session());
-app.use(bodyParser.urlencoded({extended: false}));
-app.set("view engine", "ejs");
-app.use(express.static("public"));
 
 var con = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
-    password: "password",
+    password: "password",   
     database: "project"
 });
+
+app.use(session({secret: "duckdeeptry", resave: false, saveUninitialized: true, cookie: ({ maxAge: oneDay })}));
+app.use(express.static("public"));
+app.use(flash());
+app.use(cors());
+app.use(require('cookie-parser')('keyboard cat'))
+app.use(express.json());
+app.use(passport.session());
+app.use(passport.initialize())
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+app.set("view engine", "ejs");
+
 
 passport.use(new Strategy({
     usernameField: 'email',
@@ -52,18 +53,19 @@ passport.use(new Strategy({
             return done(null, false, req.flash("errors", "Wrong password!"))
         }
         else{ 
-            console.log(data);
             return done(null, result[0], null);
         }
     });
 }));
 
 passport.serializeUser((user, done) => {
+    console.log("serializeUser: " + JSON.stringify(user));
     done(null, user.userID);
 });
 
 passport.deserializeUser((id, done) => {
     con.query("SELECT * FROM users WHERE userID = " + id, (err, result) =>{
+        console.log("deserializeUser: " + JSON.stringify(result[0]));
         done(err, result[0]);
     });
 });
@@ -76,10 +78,13 @@ app.post("/login",passport.authenticate('local', {
     successRedirect: "/",
     failureRedirect: "/login",
     successFlash: true,
-    failureFlash: true
-}
-),(req, res) =>{
-    console.log(req.session);
+    failureFlash: true,
+    session: true
+}),
+(req, res) =>{
+    con.query("UPDATE cart SET cartContent = null", (err, result)=>{
+        if (err) throw err;
+    });
 });
 
 
@@ -108,13 +113,15 @@ check("passwordCF", "Password confirmation does not match password!").custom((va
     let newAccount = {userName: data.userName, userEmail: data.userEmail.toLowerCase(), userAddress: data.userAddress, userNumber: data.userNumber, userPassword:data.userPassword}
     con.query("SELECT * FROM users WHERE userEmail = ?;", newAccount.userEmail , (err, result)=>{
         if (err) throw err;
-        test = result;
         if (result.length === 0) {
-            con.query('INSERT INTO users SET ?', newAccount , function(err, data) {
-                if (err) throw err;        
-                res.redirect('/login');
-                res.end();
+            let cartID = 0;
+            con.query('INSERT INTO users SET ?', newAccount , function(err, data, field) {
+                if (err) throw err;
+                con.query('INSERT INTO cart (userID) VALUE (' + data.insertId + ');', (err,data) =>{
+                    if (err) throw err;
+                });
             });
+            res.redirect("/login");
         }
         else {
             req.flash("errors", "Email already in use, please try again");
@@ -143,8 +150,8 @@ app.get("/", function(req, res) {
         res.redirect("/login");
     }
     else {
-        console.log(session.user);
         res.render("homepage");
+        console.log(req.session);
     }
 });
 
@@ -156,10 +163,28 @@ app.get("/PartList", function(req, res) {
                 PartList: result
             });
     });
+    console.log(req.session);
 });
 
-app.get("*", function(req, res) {
-    res.send("That route is not exist!, you are lost");
+app.post("/add-to-cart-from-part-list", (req, res) =>{
+    console.log(req.body.productCode);
+    console.log(req.session.passport.user);
+    con.query("SELECT cartContent FROM cart WHERE userID = " + req.session.passport.user + ";", (err, result)=>{
+        if (err) throw err;
+        if (result[0].cartContent != null) {
+            con.query("UPDATE cart SET cartContent = ? WHERE userID = " + req.session.passport.user + ";", result[0].cartContent + req.body.productCode + ",",
+            (err, result=>{
+                if (err) throw err;
+            }));
+        }
+        else{
+            con.query("UPDATE cart SET cartContent = ? WHERE userID = " + req.session.passport.user + ";", req.body.productCode + ",",
+            (err, result=>{
+                if (err) throw err;
+            }));
+        }
+    });
+    res.redirect("/PartList");
 });
 
 app.listen(3000, function() {  

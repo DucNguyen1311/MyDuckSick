@@ -18,7 +18,10 @@
                                 <div class="card-body">
                                 <h5 class="card-title"><%= products.productName%></h5>
                                 <p class="card-text"><%= products.productLine%> by <%= products.productBrand%></p>
-                                <a href="#" class="btn btn-primary">$<%= products.buyPrice%></a>
+                                <form method = "post" , action = "add-to-cart-from-part-list">
+                                    <input type = "hidden" value = "<%= products.productCode%>" name = "productCode">
+                                    <button class="btn btn-primary">$<%= products.buyPrice%></button>
+                                </form>
                                 </div>
                             </div>
                         </div>
