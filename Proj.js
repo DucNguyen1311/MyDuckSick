@@ -12,6 +12,7 @@ let { validationResult } = require("express-validator");
 const { check } = require("express-validator");
 const passport = require("passport");
 const { Strategy } = require("passport-local");
+const orderid = require('order-id')('key');
 const app = express();
 
 var con = mysql.createConnection({
@@ -75,18 +76,29 @@ app.get("/login", (req,res) => {
 });
 
 app.post("/login",passport.authenticate('local', {
-    successRedirect: "/",
     failureRedirect: "/login",
     successFlash: true,
     failureFlash: true,
     session: true
-}),
-(req, res) =>{
-    con.query("UPDATE cart SET cartContent = null", (err, result)=>{
+}), (req, res) => {
+    con.query("DELETE FROM cart WHERE userID = ?", req.session.passport.user , (err, result)=>{
         if (err) throw err;
+        console.log("cart DELETED");
     });
+    res.redirect("/");
 });
 
+app.get('/logout',  function (req, res, next)  {
+        con.query("DELETE FROM cart WHERE userID = ?", req.session.passport.user , (err, result)=>{
+            if (err) throw err;
+            console.log("cart DELETED");
+        });
+        req.session.destroy((err) => {
+            if (err) throw err;
+        });
+        console.log("logged out");
+        res.redirect('/');
+});
 
 app.get("/register", (req,res) => {
     res.render("register", {errors : req.flash("errors")});
@@ -114,12 +126,8 @@ check("passwordCF", "Password confirmation does not match password!").custom((va
     con.query("SELECT * FROM users WHERE userEmail = ?;", newAccount.userEmail , (err, result)=>{
         if (err) throw err;
         if (result.length === 0) {
-            let cartID = 0;
             con.query('INSERT INTO users SET ?', newAccount , function(err, data, field) {
                 if (err) throw err;
-                con.query('INSERT INTO cart (userID) VALUE (' + data.insertId + ');', (err,data) =>{
-                    if (err) throw err;
-                });
             });
             res.redirect("/login");
         }
@@ -169,22 +177,74 @@ app.get("/PartList", function(req, res) {
 app.post("/add-to-cart-from-part-list", (req, res) =>{
     console.log(req.body.productCode);
     console.log(req.session.passport.user);
-    con.query("SELECT cartContent FROM cart WHERE userID = " + req.session.passport.user + ";", (err, result)=>{
+    con.query("SELECT * FROM cart WHERE userID = ? AND productCode = ? " , [req.session.passport.user,  req.body.productCode] , (err, result) => {
         if (err) throw err;
-        if (result[0].cartContent != null) {
-            con.query("UPDATE cart SET cartContent = ? WHERE userID = " + req.session.passport.user + ";", result[0].cartContent + req.body.productCode + ",",
-            (err, result=>{
+        if (result.length === 0 ) {
+            con.query("INSERT INTO cart (userID, productCode, productQuantity) VALUES (? , ?, 1);",[req.session.passport.user, req.body.productCode], (err, result) => {
                 if (err) throw err;
-            }));
+            })
         }
-        else{
-            con.query("UPDATE cart SET cartContent = ? WHERE userID = " + req.session.passport.user + ";", req.body.productCode + ",",
-            (err, result=>{
+        if (result.length !== 0) {
+                let quantity = JSON.parse(JSON.stringify(result));
+                console.log(quantity[0].productQuantity);
+                con.query("UPDATE cart SET productQuantity = ? WHERE userID = ? AND productCode = ?;" ,
+                [quantity[0].productQuantity + 1,req.session.passport.user, req.body.productCode , req.session.passport.user], 
+                (err, result) => {
+                    if (err) throw err;
+                });
+            };
+        });
+        res.redirect("/PartList");
+    });
+
+app.post("/add-one-more-item-to-cart", (req,res) => {
+    con.query("SELECT * FROM cart WHERE userID = ? AND productCode = ? " , [req.session.passport.user,  req.body.productCode] , (err, result) => {
+        if (err) throw err;
+        let quantity = JSON.parse(JSON.stringify(result));
+        console.log(quantity[0].productQuantity);
+        con.query("UPDATE cart SET productQuantity = ? WHERE userID = ? AND productCode = ?;" ,
+        [quantity[0].productQuantity + 1,req.session.passport.user, req.body.productCode , req.session.passport.user], 
+        (err, result) => {
+            if (err) throw err;
+        });
+    });
+    res.redirect("/shoppingCart");
+});
+
+app.post("/delete-one-item-from-cart", (req,res) => {
+    con.query("SELECT * FROM cart WHERE userID = ? AND productCode = ? " , [req.session.passport.user,  req.body.productCode] , (err, result) => {
+        if (err) throw err;
+        let quantity = JSON.parse(JSON.stringify(result));
+        console.log(quantity[0].productQuantity);
+        if (quantity[0].productQuantity - 1 === 0) {
+            con.query("DELETE  FROM cart WHERE userID = ? AND productCode = ?", [req.session.passport.user,  req.body.productCode], (req,res) =>{
                 if (err) throw err;
-            }));
+            });
+        }
+
+        if (quantity[0].productQuantity - 1 != 0) {
+            con.query("UPDATE cart SET productQuantity = ? WHERE userID = ? AND productCode = ?;" ,
+            [quantity[0].productQuantity - 1,req.session.passport.user, req.body.productCode , req.session.passport.user], 
+            (err, result2) => {
+                if (err) throw err;
+            });
         }
     });
-    res.redirect("/PartList");
+    res.redirect("/shoppingCart");
+});
+
+app.post("/remove-item-from-cart", (req,res) => {
+    con.query("DELETE FROM cart WHERE userID = ? AND productCode = ? " , [req.session.passport.user,  req.body.productCode] , (err, result) => {
+        if (err) throw err;
+    });
+    res.redirect("/shoppingCart");
+});
+
+app.get("/shoppingCart", (req,res) => {
+    con.query("SELECT cart.productCode, productName, buyPrice, productQuantity, userID FROM products INNER JOIN cart ON products.productCode = cart.productCode WHERE userID = ?;", req.session.passport.user, (err, result) => {
+        if (err) throw err;
+        res.render("shoppingCart", {cart:result});
+    });
 });
 
 app.listen(3000, function() {  

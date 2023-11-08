@@ -28,6 +28,7 @@
     "lodash": "^4.17.21",
     "msnodesqlv8": "^4.1.0",
     "mysql": "^2.18.1",
+    "order-id": "^2.1.2",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "request": "^2.88.2"

@@ -1,0 +1,59 @@
+<%- include("partials/header"); %>
+
+<link rel="stylesheet" href="cart.css">
+<br>
+<br>
+<div class="container">
+    <div class="row">
+      <div class="col-12">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col">Item name</th>
+              <th scope="col">Price</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Total Price</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% let total = 0 %>
+            <% for (let [index,products] of cart.entries() ) { %>
+              <% total += products.productQuantity * products.buyPrice %>
+              <tbody>
+                <tr>
+                  <th scope="row"><%= index + 1%></th>
+                  <td class ="bg"><%= products.productName %></td>
+                  <td class ="bg">$<%= products.buyPrice%></td>
+                  <td class ="bg"><%= products.productQuantity%></td>
+                  <td class ="bg">$<%= products.productQuantity * products.buyPrice%></td>
+                  <td class ="bg">
+                    <form method = "post" action = "add-one-more-item-to-cart">
+                      <input type = "hidden" value = "<%= products.productCode%>" name = "productCode">
+                      <button class="btn btn-primary">+1 item</button>
+                    </form>
+                    <form method = "post" action = "delete-one-item-from-cart">
+                      <input type = "hidden" value = "<%= products.productCode%>" name = "productCode">
+                      <button class="btn btn-success">-1 item</button>
+                    </form>
+                    <form method = "post" action = "remove-item-from-cart">
+                      <input type = "hidden" value = "<%= products.productCode%>" name = "productCode">
+                      <button class="btn btn-danger">delete item</button>
+                    </form>
+                  </td>
+                </tr>
+              </tbody>
+                <% } %>
+          </tbody>
+          <tbody>
+            <td ALIGN=RIGHT colspan = "6" class ="bg">
+              Total Price: $<%= Math.round(total) %> 
+              <button type="button" >Place Order</button>
+            </td>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
