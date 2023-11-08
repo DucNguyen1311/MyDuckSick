@@ -197,6 +197,45 @@ app.post("/add-to-cart-from-part-list", (req, res) =>{
         res.redirect("/PartList");
     });
 
+app.post("/searchPart", (req,res) => {
+    console.log("something happened");
+    res.redirect("/searchPart/" + req.body.searchResult);
+});
+
+app.get("/searchPart/:searchResult", (req,res) => {
+    let result = "%" + req.params.searchResult + "%";
+    console.log(result);
+    con.query("SELECT * FROM products WHERE productDescription LIKE ?", result, (err, result) => {
+        if (err) throw err;
+        res.render("partSearch", {
+            PartList : result,
+            Keyword : req.params.searchResult
+        });
+    });
+});
+
+app.post("/searchPart/add-to-cart-from-search", (req, res) =>{
+    console.log(req.body.productCode);
+    console.log(req.session.passport.user);
+    con.query("SELECT * FROM cart WHERE userID = ? AND productCode = ? " , [req.session.passport.user,  req.body.productCode] , (err, result) => {
+        if (err) throw err;
+        if (result.length === 0 ) {
+            con.query("INSERT INTO cart (userID, productCode, productQuantity) VALUES (? , ?, 1);",[req.session.passport.user, req.body.productCode], (err, result) => {
+                if (err) throw err;
+            })
+        }
+        if (result.length !== 0) {
+                let quantity = JSON.parse(JSON.stringify(result));
+                console.log(quantity[0].productQuantity);
+                con.query("UPDATE cart SET productQuantity = ? WHERE userID = ? AND productCode = ?;" ,
+                [quantity[0].productQuantity + 1,req.session.passport.user, req.body.productCode , req.session.passport.user], 
+                (err, result) => {
+                    if (err) throw err;
+                });
+            };
+        });
+    });
+
 app.post("/add-one-more-item-to-cart", (req,res) => {
     con.query("SELECT * FROM cart WHERE userID = ? AND productCode = ? " , [req.session.passport.user,  req.body.productCode] , (err, result) => {
         if (err) throw err;
@@ -207,6 +246,7 @@ app.post("/add-one-more-item-to-cart", (req,res) => {
         (err, result) => {
             if (err) throw err;
         });
+
     });
     res.redirect("/shoppingCart");
 });

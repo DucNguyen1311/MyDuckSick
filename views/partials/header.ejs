@@ -16,7 +16,7 @@
         <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
             <div class="container-fluid">
               <a class="navbar-brand" href="/">
-                <img src="image/uet.png" alt="UETechnology Store" width="30" height="24">
+                <img src="/image/uet.png" alt="UETechnology Store" width="30" height="24">
                 UETechnology Store
               </a>
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,7 +28,13 @@
                     <a class="nav-link active" aria-current="page" href="/">Home</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="PartList">PartList</a>
+                    <a class="nav-link" href="/PartList">All parts</a>
+                  </li>
+                  <li class = "nav-item">
+                    <form class="form-inline" method = "post" action = "/searchPart">
+                      <input class="form-control mr-sm-2" type="search" placeholder="Search for a part!" aria-label="Search" name = "searchResult">
+                      <!-- <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button> -->
+                    </form> 
                   </li>
                   </svg>
                 </ul>
@@ -40,7 +46,7 @@
                 </button>
               </div>
               <div class="mx-auto">
-                <a class="navbar-brand " href="logout">Logout</a>
+                <a class="navbar-brand " href="/logout">Logout</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon"></span>
                 </button>

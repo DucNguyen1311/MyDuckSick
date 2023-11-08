@@ -3,23 +3,23 @@
 <head>
     <%- include("partials/header"); %>
     <title> I HATE MY SELF</title>
-    <link rel="stylesheet" href="Style.css">
+    <link rel="stylesheet" href="/Style.css">
 </head>
 <body>
     <br>
     <br>
-    <h1>List of parts</h1>
+    <h1>Result for "<%= Keyword %>" :</h1>
             <div class = "row">
                 <% for (let [index,products] of PartList.entries() ) { %>
                     <tr>
                         <div class="col-md-3">
                             <div class="card" style="width: 18rem;">
-                                <img src= <%= products.imageLink %> class="card-img-top" alt=$<%= products.buyPrice%>>
+                                <img src= <%= "/" + products.imageLink %> class="card-img-top" alt=$<%= products.buyPrice%>>
                                 <div class="card-body">
                                 <h5 class="card-title"><%= products.productName%></h5>
                                 <p class="card-text"><%= products.productLine%> by <%= products.productBrand%></p>
                                 <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
-                                <form method = "post" action = "add-to-cart-from-part-list" target = "dummyframe">
+                                <form method = "post" action = "add-to-cart-from-search" target = "dummyframe">
                                     <input type = "hidden" value = "<%= products.productCode%>" name = "productCode">
                                     <button class="btn btn-primary">$<%= products.buyPrice%></button>
                                 </form>
