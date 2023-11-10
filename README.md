@@ -1,4 +1,4 @@
-<img width="590" alt="image" src="https://github.com/DucNguyen1311/MyDuckSick/assets/125811007/8acc5743-44d7-4858-ba97-cd9fb6677dbc"># MyDuckSick
+# MyDuckSick
 Website by Duck and Huay and Dinh Tu using Nodejs and HTML+CSS.
 
 Step 1: 
