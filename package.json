@@ -25,6 +25,7 @@
     "express-mysql-session": "^3.0.0",
     "express-session": "^1.17.3",
     "express-validator": "^7.0.1",
+    "generate-unique-id": "^2.0.3",
     "lodash": "^4.17.21",
     "msnodesqlv8": "^4.1.0",
     "mysql": "^2.18.1",

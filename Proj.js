@@ -14,6 +14,8 @@ const passport = require("passport");
 const { Strategy } = require("passport-local");
 const orderid = require('order-id')('key');
 const app = express();
+const util = require('util');
+const generateUniqueId = require('generate-unique-id');
 
 var con = mysql.createConnection({
     host: "localhost",
@@ -197,9 +199,53 @@ app.post("/add-to-cart-from-part-list", (req, res) =>{
         res.redirect("/PartList");
     });
 
+app.post("/check-detail-from-part-list", (req, res) => {
+    console.log("abc123");
+    console.log(req.body.productCode)
+    res.redirect("/");
+});
+
 app.post("/searchPart", (req,res) => {
     console.log("something happened");
     res.redirect("/searchPart/" + req.body.searchResult);
+});
+
+app.get("/details/:productCode",  (req,res) => {
+    console.log(req.params.productCode);
+    function resDetail(query, imageLink, productName) {
+        con.query(query, req.params.productCode, (err,result) => {
+            if (err) throw err;
+            let detail = JSON.parse(JSON.stringify(result[0]));
+            imageLink = "/" + imageLink
+            console.log(JSON.stringify(detail) + " " + imageLink);
+            res.render("details", {
+                detail : JSON.stringify(detail),
+                imageLink : imageLink,
+                productName : productName
+            })
+        })
+    }
+    con.query("SELECT productName, imageLink FROM products WHERE productCode = ?", req.params.productCode, (err, result) => {
+        if (err) throw err
+        let link = JSON.parse(JSON.stringify(result[0])).imageLink;
+        let name = JSON.parse(JSON.stringify(result[0])).productName;
+        console.log(link);
+        if (req.params.productCode.toLowerCase().includes("cpu")) {
+            resDetail("SELECT * FROM cpudetail WHERE productCode = ?", link, name);
+        }
+        if (req.params.productCode.toLowerCase().includes("gpu")) {
+            resDetail("SELECT * FROM gpudetail WHERE productCode = ?", link, name);
+        }
+        if (req.params.productCode.toLowerCase().includes("aio")) {
+            resDetail("SELECT * FROM aiodetail WHERE productCode = ?", link, name);
+        }
+        if (req.params.productCode.toLowerCase().includes("ram")) {
+            resDetail("SELECT * FROM ramdetail WHERE productCode = ?", link, name);
+        }
+        if (req.params.productCode.toLowerCase().includes("mobo")) {
+            resDetail("SELECT * FROM mobodetail WHERE productCode = ?", link, name);
+        }
+    });
 });
 
 app.get("/searchPart/:searchResult", (req,res) => {
@@ -278,6 +324,46 @@ app.post("/remove-item-from-cart", (req,res) => {
         if (err) throw err;
     });
     res.redirect("/shoppingCart");
+});
+
+app.post("/place-order", (req,res)=>{
+    con.query("SELECT * FROM cart WHERE userID = ?", req.session.passport.user, (err, result)=>{
+        if ( err ) throw err;
+        console.log(result.length);
+        if (result.length != 0) {
+            const id = generateUniqueId({
+                length: 20,
+                useLetter: true
+            });
+            const date = new Date();
+            const orderDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+            const requiredDate = new Date(date.setMonth(date.getMonth()+3)).toISOString().slice(0, 19).replace('T', ' ');;
+            const shippedDate = null;
+            const status = "unshipped";
+            comments = null;
+            userID = req.session.passport.user;
+            console.log(id + " " + orderDate + " " + requiredDate + " " + shippedDate + " " + status + " " + comments + " " + userID);
+            var databaseObj = {orderNumber : id, orderDate : orderDate, requiredDate : requiredDate, shippedDate : shippedDate, status : status, comments : comments, userID : userID};
+            con.query("INSERT INTO orders SET " + con.escape(databaseObj), (err, result)=>{
+                if (err) throw err;
+                con.query("SELECT p.productCode, productQuantity, buyPrice FROM products p INNER JOIN cart c WHERE p.productCode = c.productCode AND c.userID = ?", req.session.passport.user, (err, result) => {
+                    console.log(JSON.parse(JSON.stringify(result[0])));
+                    let data = JSON.parse(JSON.stringify(result));
+                    for (let i = 0; i < result.length; i++) {
+                        let cart = JSON.parse(JSON.stringify(result[i]));
+                        let orderObj = {orderNumber: id, productCode: cart.productCode, quantityOrdered: cart.productQuantity, priceEach: cart.buyPrice};
+                        con.query("INSERT INTO orderdetails SET" + con.escape(orderObj), (err, result)=>{
+                            if (err) throw err;
+                            con.query("DELETE FROM CART WHERE userID = ?", req.session.passport.user, (err, result) => {
+                                if (err) throw err;
+                            });
+                        })
+                    }
+                    res.redirect("/shoppingCart");
+                });
+            })
+        }
+    })
 });
 
 app.get("/shoppingCart", (req,res) => {

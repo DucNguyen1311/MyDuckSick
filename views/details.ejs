@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<%- include("partials/header"); %>
+
+<html>
+<head>
+  <title>Product Detail Page</title>
+  <link rel="stylesheet" href="/detail.css">
+</head>
+<body>
+<br>
+<br>
+  <div class="product-detail">
+
+    <img src = <%= imageLink %> alt="Product Image">
+
+    <table>
+      <thead>
+        <tr>
+          <th>Specs</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (const [key , value] of Object.entries(JSON.parse(detail))) { %>
+          <% console.log(key + ":" + value); %>
+          <tr>
+            <td><%= key %></td>
+            <td><%= value %></td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+
+    <div class="marketing">
+      <h1><%= productName %></h1>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      <p>Order now!</p>
+    </div>
+    <a href = "javascript:history.go(-1)" ><button class = "btn btn-primary"> Back </button></a>
+
+  </div>
+
+</body>
+</html>

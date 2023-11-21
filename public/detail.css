@@ -1,0 +1,36 @@
+
+body {
+    background-color: black;
+    color: white;
+}
+
+.product-detail {
+  width: 600px;
+  margin: 0 auto;
+}
+
+.product-detail img {
+  max-width: 100%;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  border: 1px solid white;
+  padding: 5px;
+}
+
+.marketing {
+  margin-top: 20px;
+}
+
+.marketing h1 {
+  font-size: 2em;
+}
+
+.marketing p {
+  font-size: 1em;
+}

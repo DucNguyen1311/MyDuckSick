@@ -1,9 +1,13 @@
 body{
     background-color: black;
     color: white;
-    font-size: 20px;
 }
 h1{
     color:pink;
 }
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+  }
 

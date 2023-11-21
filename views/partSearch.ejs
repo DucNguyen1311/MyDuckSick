@@ -11,6 +11,7 @@
     <h1>Result for "<%= Keyword %>" :</h1>
             <div class = "row">
                 <% for (let [index,products] of PartList.entries() ) { %>
+                  <% let address = "/details/" + products.productCode %>
                     <tr>
                         <div class="col-md-3">
                             <div class="card" style="width: 18rem;">
@@ -19,10 +20,13 @@
                                 <h5 class="card-title"><%= products.productName%></h5>
                                 <p class="card-text"><%= products.productLine%> by <%= products.productBrand%></p>
                                 <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
-                                <form method = "post" action = "add-to-cart-from-search" target = "dummyframe">
-                                    <input type = "hidden" value = "<%= products.productCode%>" name = "productCode">
-                                    <button class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">$<%= products.buyPrice%></button>
-                                </form>
+                                <div class = "button-container">
+                                  <form method = "post" action = "add-to-cart-from-search" target = "dummyframe">
+                                      <input type = "hidden" value = "<%= products.productCode%>" name = "productCode">
+                                      <button class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">$<%= products.buyPrice%></button>
+                                  </form>
+                                  <a href = <%= address %> ><button class = "btn btn-primary"> Detail </button></a>
+                                </div>
                                 </div>
                                 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog" role="document">
