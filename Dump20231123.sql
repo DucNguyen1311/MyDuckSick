@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `project` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `project`;
 -- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: project
@@ -68,7 +66,6 @@ CREATE TABLE `cart` (
 
 LOCK TABLES `cart` WRITE;
 /*!40000 ALTER TABLE `cart` DISABLE KEYS */;
-INSERT INTO `cart` VALUES (12,'CPU1',4),(12,'GPU4',2),(12,'GPU3',2),(12,'CPU2',5),(12,'CPU3',1);
 /*!40000 ALTER TABLE `cart` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -136,6 +133,95 @@ INSERT INTO `gpudetail` VALUES ('GPU1','24 GB GDDR6X','2610 MHz','16384',1,'21 G
 UNLOCK TABLES;
 
 --
+-- Table structure for table `mobodetail`
+--
+
+DROP TABLE IF EXISTS `mobodetail`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `mobodetail` (
+  `productCode` varchar(45) NOT NULL,
+  `size` varchar(45) NOT NULL,
+  `ramSlot` varchar(45) NOT NULL,
+  `expandSlot` varchar(45) NOT NULL,
+  `memorySlot` varchar(45) NOT NULL,
+  `socket` varchar(45) NOT NULL,
+  PRIMARY KEY (`productCode`),
+  CONSTRAINT `mobodetail_ibfk_1` FOREIGN KEY (`productCode`) REFERENCES `products` (`productCode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `mobodetail`
+--
+
+LOCK TABLES `mobodetail` WRITE;
+/*!40000 ALTER TABLE `mobodetail` DISABLE KEYS */;
+INSERT INTO `mobodetail` VALUES ('MOBO1','E-ATX','4 slot ( max 128 GB)','2 x PCIe 5.0 x16 slots, 1 x PCIe 4.0x4 slot','5 x M.2 slots and 6 x SATA 6Gb/s ports','LGA 1700');
+/*!40000 ALTER TABLE `mobodetail` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `orderdetails`
+--
+
+DROP TABLE IF EXISTS `orderdetails`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `orderdetails` (
+  `orderNumber` varchar(30) NOT NULL,
+  `productCode` varchar(15) NOT NULL,
+  `quantityOrdered` int NOT NULL,
+  `priceEach` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`orderNumber`,`productCode`),
+  KEY `productCode` (`productCode`),
+  CONSTRAINT `orderdetails_ibfk_1` FOREIGN KEY (`orderNumber`) REFERENCES `orders` (`orderNumber`),
+  CONSTRAINT `orderdetails_ibfk_2` FOREIGN KEY (`productCode`) REFERENCES `products` (`productCode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `orderdetails`
+--
+
+LOCK TABLES `orderdetails` WRITE;
+/*!40000 ALTER TABLE `orderdetails` DISABLE KEYS */;
+INSERT INTO `orderdetails` VALUES ('6xl10rvt6bgj93fxo94y','CPU2',2,329.99),('6xl10rvt6bgj93fxo94y','CPU3',1,269.99),('akfn3ney8eb88r6g19fb','AIO1',1,119.99),('akfn3ney8eb88r6g19fb','CPU3',1,269.99);
+/*!40000 ALTER TABLE `orderdetails` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `orders`
+--
+
+DROP TABLE IF EXISTS `orders`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `orders` (
+  `orderNumber` varchar(30) NOT NULL,
+  `orderDate` date NOT NULL,
+  `requiredDate` date NOT NULL,
+  `shippedDate` date DEFAULT NULL,
+  `status` varchar(15) NOT NULL,
+  `comments` text,
+  `userID` int NOT NULL,
+  PRIMARY KEY (`orderNumber`),
+  KEY `userID` (`userID`),
+  CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `orders`
+--
+
+LOCK TABLES `orders` WRITE;
+/*!40000 ALTER TABLE `orders` DISABLE KEYS */;
+INSERT INTO `orders` VALUES ('6xl10rvt6bgj93fxo94y','2023-11-22','2024-02-22',NULL,'unshipped',NULL,12),('akfn3ney8eb88r6g19fb','2023-11-22','2024-02-22',NULL,'unshipped',NULL,13);
+/*!40000 ALTER TABLE `orders` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `productlines`
 --
 
@@ -155,7 +241,7 @@ CREATE TABLE `productlines` (
 
 LOCK TABLES `productlines` WRITE;
 /*!40000 ALTER TABLE `productlines` DISABLE KEYS */;
-INSERT INTO `productlines` VALUES ('AIO Cooler','AiO stands for All in One, which means that you\'ll get a complete package, consisting of radiator, fan, pump, tubes and cooling unit, which reliably cools your CPU'),('CPU','The Central Processing Unit (CPU) is the primary component of a computer that acts as its control center.'),('Graphic Card/GPU','A graphics card is an expansion card for your PC that is responsible for rendering images to the display'),('RAM','RAM is your computer or laptops short-term memory. Its where the data is stored that your computer processor needs to run your applications and open your files.');
+INSERT INTO `productlines` VALUES ('AIO Cooler','AiO stands for All in One, which means that you\'ll get a complete package, consisting of radiator, fan, pump, tubes and cooling unit, which reliably cools your CPU'),('CPU','The Central Processing Unit (CPU) is the primary component of a computer that acts as its control center.'),('Graphic Card/GPU','A graphics card is an expansion card for your PC that is responsible for rendering images to the display'),('Motherboard','Motherboard is the main printed circuit board within a computer, which means it\'s the primary piece of circuitry that all of the other pieces plug into to create a cohesive whole'),('PSU','A power supply unit (PSU) converts mains AC to low-voltage regulated DC power for the internal components of a computer.'),('RAM','RAM is your computer or laptops short-term memory. Its where the data is stored that your computer processor needs to run your applications and open your files.');
 /*!40000 ALTER TABLE `productlines` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -187,7 +273,7 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES ('AIO1','MasterLiquid ML360','AIO Cooler','Cooler Master','masterliquidml360aiocoolercoolermaster',200,119.99,'image/ML360.png'),('CPU1','i9 13900K','CPU','Intel','i913900kcpuintel',220,599.99,'image/i9-13900k.jpg'),('CPU2','Ryzen 9 7950x3D','CPU','AMD','ryzen97950x3dcpuamd',328,329.99,'image/7950x3d.jpg'),('CPU3','Ryzen 7 7700x','CPU','AMD','ryzen77700xcpuamd',234,269.99,'image/7700X.jpg'),('GPU1','RTX4090 ROG STRIX x Evangelion','Graphic Card/GPU','ASUS ROG/Nvidia','rtx4090rogstrixxevangeliongraphiccardasusroggpunvidia',400,2499.99,'image/4090.png'),('GPU2','Red Dragon Radeon RX 6800XT','Graphic Card/GPU','PowerColor/Nvidia','reddragonradeonrx6800xtgraphiccardpowercolornvidia',232,549.99,'image/RX6800XT.jpg'),('GPU3','ARC A750','Graphic Card/GPU','Intel','arca750graphiccardintelgpunvidia',23,289.99,'image/A750.jpg'),('GPU4','RTX4080 ProArt ','Graphic Card/GPU','ASUS/Nvidia','rtx4080proartgraphiccardasusgpunvidia',134,1449.99,'image/4080proArt.jpg'),('RAM1','G.Skill Trident Z Royal 8GBx2','RAM','G.Skill','gskilltridentzroyal8gbx2ramgskillnvidia',123,162.99,'image/TridentZRoyal.jpg');
+INSERT INTO `products` VALUES ('AIO1','MasterLiquid ML360','AIO Cooler','Cooler Master','masterliquidml360aiocoolercoolermaster',200,119.99,'image/ML360.png'),('CPU1','i9 13900K','CPU','Intel','i913900kcpuintel',220,599.99,'image/i9-13900k.jpg'),('CPU2','Ryzen 9 7950x3D','CPU','AMD','ryzen97950x3dcpuamd',328,329.99,'image/7950x3d.jpg'),('CPU3','Ryzen 7 7700x','CPU','AMD','ryzen77700xcpuamd',234,269.99,'image/7700X.jpg'),('GPU1','RTX4090 ROG STRIX x Evangelion','Graphic Card/GPU','ASUS ROG/Nvidia','rtx4090rogstrixxevangeliongraphiccardasusroggpunvidia',400,2499.99,'image/4090.png'),('GPU2','Red Dragon Radeon RX 6800XT','Graphic Card/GPU','PowerColor/Nvidia','reddragonradeonrx6800xtgraphiccardpowercolornvidia',232,549.99,'image/RX6800XT.jpg'),('GPU3','ARC A750','Graphic Card/GPU','Intel','arca750graphiccardintelgpunvidia',23,289.99,'image/A750.jpg'),('GPU4','RTX4080 ProArt ','Graphic Card/GPU','ASUS/Nvidia','rtx4080proartgraphiccardasusgpunvidia',134,1449.99,'image/4080proArt.jpg'),('MOBO1','Asus ROG MAXIMUS Z790 EXTREME','Motherboard','ASUS ROG','asusrigmaximusz790extrememotherboardasusrog',432,1160.99,'image/maximusz790extreme.png'),('RAM1','G.Skill Trident Z Royal 8GBx2','RAM','G.Skill','gskilltridentzroyal8gbx2ramgskillnvidia',123,162.99,'image/TridentZRoyal.jpg');
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -247,6 +333,14 @@ LOCK TABLES `users` WRITE;
 INSERT INTO `users` VALUES (11,'123@gmail.com','123','123','123',123),(12,'duyduc.miaham@gmail.com','123','Duc Nguyen','Pandora garden hanoi',973404879),(13,'test@gmail.com','123','123','123',123);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping events for database 'project'
+--
+
+--
+-- Dumping routines for database 'project'
+--
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -257,4 +351,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-11-10 14:02:19
+-- Dump completed on 2023-11-23 13:52:37
