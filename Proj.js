@@ -16,6 +16,17 @@ const orderid = require('order-id')('key');
 const app = express();
 const util = require('util');
 const generateUniqueId = require('generate-unique-id');
+var nodemailer = require("nodemailer");
+
+var transporter =  nodemailer.createTransport({ // config mail server
+    service: 'Gmail',
+    auth: {
+        user: 'uettechnologicalshop@gmail.com',
+        pass: 'uxpe snyi lnhg myso'
+    }
+});
+
+
 
 var con = mysql.createConnection({
     host: "localhost",
@@ -165,15 +176,46 @@ app.get("/", function(req, res) {
     }
 });
 
+app.post("/PartList", (req,res)=>{
+    console.log(req.body.partType);
+    console.log(req.body.minPrice + "-" + req.body.maxPrice)
+    var check = Number(req.body.minPrice) > Number(req.body.maxPrice);
+    if (check === true) {
+        req.flash("errors", "Minimum Price cannot be bigger than Maximum Price!!!");
+        res.redirect("/PartList");
+    }
+    else {
+        res.redirect("/PartList/" + req.body.partType + "+" + req.body.minPrice + "+" + req.body.maxPrice);
+    }
+});
+
 app.get("/PartList", function(req, res) {
         var sql = " SELECT * FROM products;"
         con.query(sql, function(err, result) {
             if (err) throw err;
             res.render('PartList', {
-                PartList: result
+                PartList: result,
+                errors : req.flash("errors")
             });
     });
     console.log(req.session);
+});
+
+app.get("/PartList/:code", (req,res) => {
+    let arr = req.params.code.split("+");
+    let type = "%" + arr[0] + "%";
+    let minP = arr[1];
+    let maxP = arr[2];
+    if (type === "%ALL%") {
+        type = "%%";
+    }
+    console.log(type + " " + minP + " " + maxP);
+    con.query("SELECT * FROM products WHERE buyPrice BETWEEN ? AND ? AND productCode LIKE ?", [minP,  maxP, type], (err, result) => {
+        res.render('PartList', {
+            PartList: JSON.parse(JSON.stringify(result)),
+            errors : req.flash("errors")
+        });
+    });
 });
 
 app.post("/add-to-cart-from-part-list", (req, res) =>{
@@ -359,7 +401,41 @@ app.post("/place-order", (req,res)=>{
                             });
                         })
                     }
-                    res.redirect("/shoppingCart");
+                    con.query("SELECT * FROM users where userID = ?", req.session.passport.user, (err, result) => {
+                        let email = JSON.parse(JSON.stringify(result[0])).userEmail;
+                        console.log(email);
+                        con.query("SELECT productName, quantityOrdered, priceEach FROM project.orderdetails a JOIN products b on a.productCode = b.productCode WHERE orderNumber = ?", id, (err, result) => {
+                            let orderData = JSON.parse(JSON.stringify(result));
+                            let totalPrice = 0;
+                            console.log(orderData);
+                            let message = " <p>Greetings from UET Technological Shop<br><br>We would like to inform you that you have made a purchase on our website<br><br>Time:" + date + "<br><br>Order Code: " + id +"<br><br>Order content: <br>";
+                            for (let i = 0; i < orderData.length; i++ ) {
+                                let pName = orderData[i].productName;
+                                let qOrdered = orderData[i].quantityOrdered;
+                                let price = orderData[i].priceEach * qOrdered;
+                                totalPrice += price;
+                                message += "* " + qOrdered + " " + pName + " : " + price + "$<br>"
+                            }
+                            message += "<br>Total Price : " + Math.round(totalPrice) + "$<br><br>";
+                            message += " DO NOT REPLY TO THIS EMAIL! IT WAS AUTO SENT!<br>If you did not make this purchase, please inform us at 0932812931!<br>Thank you for choosing us!<br></p>"
+                            console.log(message);
+                            var mailOptions = { // thiết lập đối tượng, nội dung gửi mail
+                                from: 'no-reply@gmail.com',
+                                to: email,
+                                subject: "Order notification!",
+                                html: message
+                            }
+                            transporter.sendMail(mailOptions, (err, result) => {
+                                if (err){
+                                console.log(err)
+                                    res.json('Opps error occured')
+                                } else{
+                                    res.json('thanks for e-mailing me');
+                                }
+                            })
+                            res.redirect("/shoppingCart");
+                        }); 
+                    });
                 });
             })
         }
@@ -373,6 +449,13 @@ app.get("/shoppingCart", (req,res) => {
     });
 });
 
-app.listen(3000, function() {  
+app.get("/orderHistory", (req,res) => {
+    con.query("SELECT orders.orderdate, orders.status ,orders.userID, orders.orderNumber, SUM( quantityOrdered * priceEach) as totalPrice FROM orderdetails JOIN orders ON orderdetails.orderNumber = orders.orderNumber WHERE userID = ? GROUP BY orderNumber;", req.session.passport.user, (err, result) => {
+        if (err) throw err;
+        res.render("orderHistory.ejs", {history : result});
+    });
+});
+
+app.listen(3000,"0.0.0.0", function() {  
     console.log("Website successfully launched on port 3000");
 });

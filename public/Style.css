@@ -7,7 +7,40 @@ h1{
 }
 
 .button-container {
+    margin-top: auto;
     display: flex;
     justify-content: space-between;
   }
 
+.card-title {
+    margin-top: auto;
+}
+
+.card-text {
+    margin-top: auto;
+}
+
+  .card-body {
+    display: flex !important;
+    flex-direction: column !important;
+    }
+    
+    .card .btn {
+    margin-top: auto !important;
+    }
+
+    .select {
+        width: 100px;
+        text-overflow: ellipsis;
+        appearance: none;
+        /* safari */
+        -webkit-appearance: none;
+        /* other styles for aesthetics */
+        font-size: 1.15rem;
+        padding: 0.675em 6em 0.675em 1em;
+        background-color: #fff;
+        border: 1px solid #caced1;
+        border-radius: 0.25rem;
+        color: #000;
+        cursor: pointer;
+      }

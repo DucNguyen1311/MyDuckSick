@@ -1,0 +1,25 @@
+"filename", "language", "JSON", "SQL", "JavaScript", "CSS", "HTML", "Markdown", "comment", "blank", "total"
+"d:\Work\Second year\Database\MyDuckSick\Dump20231123.sql", "SQL", 0, 227, 0, 0, 0, 0, 78, 50, 355
+"d:\Work\Second year\Database\MyDuckSick\Proj.js", "JavaScript", 0, 0, 423, 0, 0, 0, 0, 35, 458
+"d:\Work\Second year\Database\MyDuckSick\README.md", "Markdown", 0, 0, 0, 0, 0, 34, 0, 32, 66
+"d:\Work\Second year\Database\MyDuckSick\package-lock.json", "JSON", 2655, 0, 0, 0, 0, 0, 0, 1, 2656
+"d:\Work\Second year\Database\MyDuckSick\package.json", "JSON", 43, 0, 0, 0, 0, 0, 0, 1, 44
+"d:\Work\Second year\Database\MyDuckSick\public\Style.css", "CSS", 0, 0, 0, 38, 0, 0, 2, 6, 46
+"d:\Work\Second year\Database\MyDuckSick\public\cart.css", "CSS", 0, 0, 0, 19, 0, 0, 0, 4, 23
+"d:\Work\Second year\Database\MyDuckSick\public\detail.css", "CSS", 0, 0, 0, 28, 0, 0, 0, 8, 36
+"d:\Work\Second year\Database\MyDuckSick\public\login.css", "CSS", 0, 0, 0, 135, 0, 0, 1, 0, 136
+"d:\Work\Second year\Database\MyDuckSick\public\register.css", "CSS", 0, 0, 0, 145, 0, 0, 1, 0, 146
+"d:\Work\Second year\Database\MyDuckSick\test.js", "JavaScript", 0, 0, 1, 0, 0, 0, 3, 1, 5
+"d:\Work\Second year\Database\MyDuckSick\views\AddPart.ejs", "HTML", 0, 0, 0, 0, 39, 0, 0, 3, 42
+"d:\Work\Second year\Database\MyDuckSick\views\PartList.ejs", "HTML", 0, 0, 0, 0, 100, 0, 1, 2, 103
+"d:\Work\Second year\Database\MyDuckSick\views\Pstyle.css", "CSS", 0, 0, 0, 0, 0, 0, 0, 1, 1
+"d:\Work\Second year\Database\MyDuckSick\views\details.ejs", "HTML", 0, 0, 0, 0, 37, 0, 0, 7, 44
+"d:\Work\Second year\Database\MyDuckSick\views\footer.ejs", "HTML", 0, 0, 0, 0, 0, 0, 0, 1, 1
+"d:\Work\Second year\Database\MyDuckSick\views\homepage.ejs", "HTML", 0, 0, 0, 0, 42, 0, 0, 3, 45
+"d:\Work\Second year\Database\MyDuckSick\views\login.ejs", "HTML", 0, 0, 0, 0, 46, 0, 1, 0, 47
+"d:\Work\Second year\Database\MyDuckSick\views\orderHistory.ejs", "HTML", 0, 0, 0, 0, 7, 0, 0, 1, 8
+"d:\Work\Second year\Database\MyDuckSick\views\partSearch.ejs", "HTML", 0, 0, 0, 0, 56, 0, 0, 0, 56
+"d:\Work\Second year\Database\MyDuckSick\views\partials\header.ejs", "HTML", 0, 0, 0, 0, 64, 0, 1, 1, 66
+"d:\Work\Second year\Database\MyDuckSick\views\register.ejs", "HTML", 0, 0, 0, 0, 80, 0, 0, 1, 81
+"d:\Work\Second year\Database\MyDuckSick\views\shoppingCart.ejs", "HTML", 0, 0, 0, 0, 61, 0, 0, 2, 63
+"Total", "-", 2698, 227, 424, 365, 532, 34, 88, 160, 4528

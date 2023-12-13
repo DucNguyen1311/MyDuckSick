@@ -3,19 +3,65 @@
 <head>
     <%- include("partials/header"); %>
     <title> I HATE MY SELF</title>
-    <link rel="stylesheet" href="Style.css">
+    <link rel="stylesheet" href="/Style.css">
 </head>
 <body>
     <br>
     <br>
-    <h1>List of parts</h1>
+  
+ <!-- Example single danger button -->
+ <form action = "/PartList" method = "POST">
+  <p>Parts filter, choose what you want to see.</p>
+  <select name="partType" id="partType">
+    <option value="ALL">Part type ( default: all)</option>
+    <option value="RAM">RAM</option>
+    <option value="CPU">CPU</option>
+    <option value="GPU">GPU</option>
+    <option value="SSD">SSD</option>
+  </select>
+  <select name="minPrice" id="minPrice">
+    <option value="0">Min price ( default: 0$)</option>
+    <option value ="50">50$</option>
+    <option value="100">100$</option>
+    <option value="500">500$</option>
+    <option value="1000">1000$</option>
+    <option value="2000">2000$</option>
+    <option value="3000">3000$</option>
+    <option value="4000">4000$</option>
+    <option value="5000">5000$</option>
+  </select>
+  <select name="maxPrice" id="maxPrice">
+    <option value="100000000000">Max price (default: no limit)</option>
+    <option value ="50">50$</option>
+    <option value="100">100$</option>
+    <option value="500">500$</option>
+    <option value="1000">1000$</option>
+    <option value="2000">2000$</option>
+    <option value="3000">3000$</option>
+    <option value="4000">4000$</option>
+    <option value="5000">5000$</option>
+    <option value="10000">10000$</option>
+  </select>
+  <div>
+    <% if (errors !=="") {%>
+        <% errors.forEach((item) => { %>
+            <div class = "alert alert-danger">
+              <%= item %>
+            </div>
+        <% }); %>
+    <% }; %>
+  </div>
+  <br><br>
+      <input type="submit" value="submit" />
+  </form>
             <div class = "row">
                 <% for (let [index,products] of PartList.entries() ) { %>
                   <% let address = "/details/" + products.productCode %>
+                  <% let link = "/" + products.imageLink %>
                     <tr>
                         <div class="col-md-3">
-                            <div class="card" style="width: 18rem;">
-                                <img src= <%= products.imageLink %> class="card-img-top" alt=$<%= products.buyPrice%>>
+                            <div class="card h-100" style="width: 18rem;">
+                                <img src= <%= link %> class="card-img-top" alt=$<%= products.buyPrice%>>
                                 <div class="card-body">
                                 <h5 class="card-title"><%= products.productName%></h5>
                                 <p class="card-text"><%= products.productLine%> by <%= products.productBrand%></p>
