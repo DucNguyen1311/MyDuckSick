@@ -135,7 +135,7 @@ check("passwordCF", "Password confirmation does not match password!").custom((va
         req.flash("errors", errorsArr);
         res.redirect("/register");
     }
-    let newAccount = {userName: data.userName, userEmail: data.userEmail.toLowerCase(), userAddress: data.userAddress, userNumber: data.userNumber, userPassword:data.userPassword}
+    let newAccount = {userName: data.userName, userEmail: data.userEmail.toLowerCase(), userAddress: data.userAddress, userNumber: data.userNumber, userPassword:data.userPassword, IsAdmin: 0}
     con.query("SELECT * FROM users WHERE userEmail = ?;", newAccount.userEmail , (err, result)=>{
         if (err) throw err;
         if (result.length === 0) {
@@ -166,13 +166,36 @@ app.post("/AddPart", function(req, res) {
         }); 
 });
 
+app.get("/DeletePart", (req,res) => {
+    res.render("delete");
+});
+
+app.post("/DeletePart", (req,res) => {
+    con.query("DELETE FROM products WHERE productCode = ? ", req.body.deleteItem, (err, result) => {
+        if (err) throw err
+        console.log("Successful!");
+    })
+    res.redirect("/DeletePart");
+});
+
 app.get("/", function(req, res) {
     if (!req.isAuthenticated()) {
         res.redirect("/login");
     }
     else {
-        res.render("homepage");
-        console.log(req.session);
+        con.query("SELECT * FROM users where userID = ?", req.session.passport.user, (err, result) => {
+            if (err) throw err
+            let admin = JSON.parse(JSON.stringify(result[0])).IsAdmin;
+            console.log(admin + " hey check me!");
+            if (admin === 0) {
+                res.render("homepage");
+                console.log(req.session);
+            }
+            if (admin === 1) {
+                res.render("adminHomepage");
+                console.log("An admin logged in");
+            }
+        });
     }
 });
 
@@ -286,6 +309,12 @@ app.get("/details/:productCode",  (req,res) => {
         }
         if (req.params.productCode.toLowerCase().includes("mobo")) {
             resDetail("SELECT * FROM mobodetail WHERE productCode = ?", link, name);
+        }
+        if (req.params.productCode.toLowerCase().includes("psu")) {
+            resDetail("SELECT * FROM psudetail WHERE productCode = ?", link, name);
+        }
+        if (req.params.productCode.toLowerCase().includes("drive")) {
+            resDetail("SELECT * FROM drivedetail WHERE productCode = ?", link, name);
         }
     });
 });
@@ -453,6 +482,13 @@ app.get("/orderHistory", (req,res) => {
     con.query("SELECT orders.orderdate, orders.status ,orders.userID, orders.orderNumber, SUM( quantityOrdered * priceEach) as totalPrice FROM orderdetails JOIN orders ON orderdetails.orderNumber = orders.orderNumber WHERE userID = ? GROUP BY orderNumber;", req.session.passport.user, (err, result) => {
         if (err) throw err;
         res.render("orderHistory.ejs", {history : result});
+    });
+});
+
+app.get("/allOrders", (req,res) => {
+    con.query("SELECT orders.orderdate, orders.status ,orders.userID, orders.orderNumber, SUM( quantityOrdered * priceEach) as totalPrice FROM orderdetails JOIN orders ON orderdetails.orderNumber = orders.orderNumber GROUP BY orderNumber;", (err, result) => {
+        if (err) throw err;
+        res.render("allOrders.ejs", {history : result});
     });
 });
 

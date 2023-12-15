@@ -1,0 +1,13 @@
+<%- include("partials/admin"); %>
+<link rel="stylesheet" href="/Style.css">
+<br><br>
+<div class = "row">
+    <% for (let [index,orders] of history.entries() ) { %>
+        <% let text = "User Ordered: " + orders.userID + " Order Code: " + orders.orderNumber + " , Ordered date: " + orders.orderdate + " , Total Spend: " + orders.totalPrice + "$ , Status : " + orders.status + "."; %> 
+        <div class="card">
+            <div class="card-body">
+                <%= text %>
+            </div>
+          </div>
+          <% } %>
+</div>

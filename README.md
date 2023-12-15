@@ -1,5 +1,5 @@
 # MyDuckSick
-Website by Duck and Huay and Dinh Tu using Nodejs and HTML+CSS.
+Website by Duck and Huay and Dinh Tu using Nodejs, Express JS, Bootstrap, HTML, CSS, Mysql.
 
 Step 1: 
 download Git https://git-scm.com/downloads
